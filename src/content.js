@@ -3,8 +3,8 @@
 // Logic files import from this module; no jokes are hardcoded anywhere else.
 // ============================================================================
 
-/** Where the share text points. Replace before shipping. */
-export const GAME_URL = 'https://example.com/manager-simulator';
+/** Where the share text points (the live game). */
+export const GAME_URL = 'https://wellsdouraghy.github.io/manager-simulator/';
 
 /** The product. The July-AI end screen links here. */
 export const JULY_URL = 'https://withjuly.com';
