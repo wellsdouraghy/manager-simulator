@@ -4,7 +4,7 @@
 // ============================================================================
 
 /** Where the share text points (the live game). */
-export const GAME_URL = 'https://wellsdouraghy.github.io/manager-simulator/';
+export const GAME_URL = 'https://manager-simulator.com';
 
 /** The product. The July-AI end screen links here. */
 export const JULY_URL = 'https://withjuly.com';
