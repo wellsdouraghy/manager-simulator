@@ -23,16 +23,18 @@ import {
   JULY_CTA,
   JULY_URL,
 } from './content.js';
+import { createLeaderboard } from './leaderboard.js';
 
 // --- Title predicate table -------------------------------------------------
 // ctx = { retained, dealsClosedTarget, survived }
 const TITLE_PREDICATES = {
-  deity: (s, m, ctx) => m.commission >= 60000 && ctx.retained === 5,
-  closer: (s) => (s.dealsClosedTarget || 0) >= 4,
-  speed: (s, m) => m.avgResponseTime > 0 && m.avgResponseTime < 4,
+  deity: (s, m, ctx) =>
+    m.commission >= 90000 && ctx.retained === 5 && m.avgResponseTime < 4,
+  closer: (s) => (s.dealsClosedTarget || 0) >= 6,
+  speed: (s, m) => m.avgResponseTime > 0 && m.avgResponseTime < 3,
   martyr: (s) =>
     (s.quickCallsOffered || 0) > 0 && s.quickCallsTaken === s.quickCallsOffered,
-  grinding: (s, m, ctx) => m.peakBurnout >= 80 && ctx.survived,
+  grinding: (s, m, ctx) => m.peakBurnout >= 90 && ctx.survived,
   lostTalent: (s) => (s.creatorsLost || 0) >= 1,
   passout: (s) => s.failReason === 'passout',
   default: () => true,
@@ -110,6 +112,7 @@ export function createReport({ meters, content, storage, juice }) {
   let onRunBackCb = null;
   let onToggleAugustCb = null;
   let countRaf = 0;
+  const leaderboard = createLeaderboard();
 
   // Commission count-up. The final value is already rendered, so if rAF is
   // starved (background tab) nothing looks broken — this only animates 0→final.
@@ -329,6 +332,8 @@ export function createReport({ meters, content, storage, juice }) {
         </div>
         ${augustUnlocked ? `<div class="rd-august-desc">${august.description}</div>` : ''}
 
+        <div class="rd-leaderboard" id="rd-leaderboard"></div>
+
         ${model.survived ? '' : `<div class="rd-watermark">${copy.incompleteStamp}</div>`}
       </div>
       ${confetti}
@@ -367,6 +372,11 @@ export function createReport({ meters, content, storage, juice }) {
       onRunBackCb?.();
     });
 
+    // Mount the shared leaderboard (name entry → ranked board → Cmd+Shift+E
+    // admin delete). Scored on this run's commission.
+    const lbEl = el.querySelector('#rd-leaderboard');
+    if (lbEl) leaderboard.mount(lbEl, { score: model.commission, grade: model.grade });
+
     el.classList.add('show');
     // Expose the built share text + title for headless verification.
     el.dataset.shareText = buildShareText(model);
@@ -376,6 +386,7 @@ export function createReport({ meters, content, storage, juice }) {
   function hide() {
     if (countRaf) cancelAnimationFrame(countRaf);
     countRaf = 0;
+    leaderboard.unmount();
     if (root) {
       root.classList.remove('show');
       root.innerHTML = '';

@@ -56,7 +56,7 @@ export const G = {
   paused: false, // creator-leaves overlay freezes the running block + channels
 };
 
-export const DAY_LENGTH = 180; // seconds, 9:00 AM → 6:00 PM
+export const DAY_LENGTH = 90; // seconds, 9:00 AM → 6:00 PM
 
 // Burnout points shed per game-second while running — the passive relief that
 // replaced coffee. Tuned below the damage rates so chaos still bites.
@@ -149,6 +149,14 @@ const engine = createTaskEngine({
       juice.damage(label, 0.02);
       juice.sound.expireBuzz();
       meters.addBurnout(8);
+      // A rough day costs talent broadly, not just on dropped DMs: any expiry
+      // bleeds a little morale off one still-present creator (chosen at random).
+      // This makes a sloppy run visibly lose the roster instead of showing 5/5.
+      const present = CREATORS.filter((c) => !meters.isGone(c.id));
+      if (present.length) {
+        const victim = present[Math.floor(Math.random() * present.length)];
+        meters.addHappiness(victim.id, -6, { reason: 'chaos' });
+      }
     } else if (type === 'resolve') {
       // Count clears toward the Last Stand recovery goal.
       if (lastStand.active) lastStand.cleared++;

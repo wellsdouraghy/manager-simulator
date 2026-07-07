@@ -10,9 +10,9 @@
 const roundK = (n) => Math.round(n);
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 
-const START_HAPPINESS = 72;
+const START_HAPPINESS = 58;
 const CRACK_LOSS = 8; // a loss this big triggers the heart-crack animation
-const BAD_CHOICE_PENALTY = 800; // flat $ hit for any wrong reply (read the email!)
+const BAD_CHOICE_PENALTY = 1200; // flat $ hit for any wrong reply (read the email!)
 const WARN_HAPPINESS = 30; // below this, warn the player a creator may leave
 
 /**
@@ -128,6 +128,7 @@ export function createMeters({ hud, creators = [] }) {
 
   function render() {
     counter.textContent = fmt(state.displayed);
+    counter.classList.toggle('negative', state.commission < 0);
   }
   render();
 
@@ -296,7 +297,7 @@ export function createMeters({ hud, creators = [] }) {
     // Burnout: explicit effect plus a flat +3 for any 'bad' resolution. Both
     // stack and route through the clamped mutator.
     let burnoutDelta = typeof effects.burnout === 'number' ? effects.burnout : 0;
-    if (effects.quality === 'bad') burnoutDelta += 3;
+    if (effects.quality === 'bad') burnoutDelta += 5;
     if (burnoutDelta) addBurnout(burnoutDelta);
 
     // Happiness routes to the task's creator (DM channel), or an explicit id.

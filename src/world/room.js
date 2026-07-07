@@ -235,24 +235,19 @@ export function buildRoom() {
   }
   group.add(plant);
 
-  // Framed poster on the front wall ("art")
+  // Framed "HANG IN THERE" cat poster on the front wall — the motivational
+  // meme every burnt-out office has. Drawn to a canvas at runtime (no asset
+  // files), so it stays crisp and on-brand-silly.
   const poster = new THREE.Group();
-  poster.position.set(-1.3, 1.8, Z_MIN + 0.04);
-  const posterFrame = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.82, 0.03), trimMat);
+  poster.position.set(-1.32, 1.78, Z_MIN + 0.04);
+  const posterFrame = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.9, 0.03), mat(0x2c2418));
   poster.add(posterFrame);
   const posterArt = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.52, 0.72),
-    mat(0x31548a),
+    new THREE.PlaneGeometry(0.56, 0.8),
+    new THREE.MeshBasicMaterial({ map: makeHangInThereTexture() }),
   );
   posterArt.position.z = 0.02;
   poster.add(posterArt);
-  const posterSun = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.12, 0.12, 0.01, 12),
-    mat(PALETTE.gold),
-  );
-  posterSun.rotation.x = Math.PI / 2;
-  posterSun.position.set(0.1, 0.15, 0.03);
-  poster.add(posterSun);
   group.add(poster);
 
   // Rug under the desk area
@@ -261,4 +256,187 @@ export function buildRoom() {
   group.add(rug);
 
   return { group, setDayProgress, doorMesh: slab, doorAnchor };
+}
+
+// --- "Hang in there" cat poster texture ---------------------------------------
+// A stylized orange kitten clinging to a branch over a warm cream backdrop,
+// with the classic block-letter caption. Everything is drawn with Canvas 2D so
+// there are zero external asset files.
+function makeHangInThereTexture() {
+  const W = 512;
+  const H = 720;
+  const c = document.createElement('canvas');
+  c.width = W;
+  c.height = H;
+  const g = c.getContext('2d');
+
+  // Backdrop — soft photo-poster cream with a gentle vignette.
+  g.fillStyle = '#f4e6c6';
+  g.fillRect(0, 0, W, H);
+  const vg = g.createRadialGradient(W / 2, 300, 80, W / 2, 300, 420);
+  vg.addColorStop(0, 'rgba(255,255,255,0.35)');
+  vg.addColorStop(1, 'rgba(120,90,40,0.22)');
+  g.fillStyle = vg;
+  g.fillRect(0, 0, W, H);
+
+  // Branch the kitten dangles from.
+  g.strokeStyle = '#7a4f26';
+  g.lineWidth = 30;
+  g.lineCap = 'round';
+  g.beginPath();
+  g.moveTo(40, 150);
+  g.lineTo(472, 128);
+  g.stroke();
+  g.strokeStyle = '#98663a';
+  g.lineWidth = 10;
+  g.beginPath();
+  g.moveTo(60, 142);
+  g.lineTo(452, 122);
+  g.stroke();
+
+  const ORANGE = '#f0a24b';
+  const ORANGE_D = '#d98530';
+  const CREAM = '#ffe9cf';
+
+  // Dangling body (tapered, hanging straight down under the paws).
+  g.fillStyle = ORANGE;
+  g.beginPath();
+  g.moveTo(196, 250);
+  g.quadraticCurveTo(150, 400, 210, 500);
+  g.quadraticCurveTo(256, 545, 302, 500);
+  g.quadraticCurveTo(362, 400, 316, 250);
+  g.closePath();
+  g.fill();
+  // Cream tummy.
+  g.fillStyle = CREAM;
+  g.beginPath();
+  g.ellipse(256, 400, 46, 96, 0, 0, Math.PI * 2);
+  g.fill();
+  // Back paws at the bottom of the dangle.
+  g.fillStyle = ORANGE_D;
+  for (const px of [222, 290]) {
+    g.beginPath();
+    g.ellipse(px, 505, 26, 20, 0, 0, Math.PI * 2);
+    g.fill();
+  }
+
+  // Two front paws gripping over the branch.
+  g.fillStyle = ORANGE;
+  for (const px of [196, 316]) {
+    g.beginPath();
+    g.ellipse(px, 138, 30, 40, 0, 0, Math.PI * 2);
+    g.fill();
+    // toe lines
+    g.strokeStyle = ORANGE_D;
+    g.lineWidth = 3;
+    for (const dx of [-9, 0, 9]) {
+      g.beginPath();
+      g.moveTo(px + dx, 120);
+      g.lineTo(px + dx, 148);
+      g.stroke();
+    }
+  }
+
+  // Head (big, just under the paws — the face that sells the meme).
+  const hx = 256;
+  const hy = 250;
+  // ears
+  g.fillStyle = ORANGE;
+  for (const [ex, dir] of [[196, -1], [316, 1]]) {
+    g.beginPath();
+    g.moveTo(ex, hy - 40);
+    g.lineTo(ex + dir * 44, hy - 96);
+    g.lineTo(ex + dir * 60, hy - 30);
+    g.closePath();
+    g.fill();
+    g.fillStyle = '#f7c9a0';
+    g.beginPath();
+    g.moveTo(ex + dir * 6, hy - 44);
+    g.lineTo(ex + dir * 40, hy - 84);
+    g.lineTo(ex + dir * 46, hy - 40);
+    g.closePath();
+    g.fill();
+    g.fillStyle = ORANGE;
+  }
+  // head fill
+  g.fillStyle = ORANGE;
+  g.beginPath();
+  g.ellipse(hx, hy, 96, 86, 0, 0, Math.PI * 2);
+  g.fill();
+  // tabby stripes on the forehead
+  g.strokeStyle = ORANGE_D;
+  g.lineWidth = 8;
+  g.lineCap = 'round';
+  for (const dx of [-20, 0, 20]) {
+    g.beginPath();
+    g.moveTo(hx + dx, hy - 78);
+    g.lineTo(hx + dx * 1.4, hy - 40);
+    g.stroke();
+  }
+  // cheeks (cream)
+  g.fillStyle = CREAM;
+  g.beginPath();
+  g.ellipse(hx, hy + 26, 74, 52, 0, 0, Math.PI * 2);
+  g.fill();
+  // worried eyes
+  g.fillStyle = '#2a2018';
+  for (const ex of [hx - 38, hx + 38]) {
+    g.beginPath();
+    g.ellipse(ex, hy - 4, 17, 21, 0, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = '#fff';
+    g.beginPath();
+    g.arc(ex + 5, hy - 12, 5, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = '#2a2018';
+  }
+  // worried eyebrows
+  g.strokeStyle = '#2a2018';
+  g.lineWidth = 6;
+  g.beginPath();
+  g.moveTo(hx - 56, hy - 34);
+  g.lineTo(hx - 22, hy - 26);
+  g.moveTo(hx + 56, hy - 34);
+  g.lineTo(hx + 22, hy - 26);
+  g.stroke();
+  // nose
+  g.fillStyle = '#c9695f';
+  g.beginPath();
+  g.moveTo(hx - 10, hy + 20);
+  g.lineTo(hx + 10, hy + 20);
+  g.lineTo(hx, hy + 32);
+  g.closePath();
+  g.fill();
+  // mouth (little worried :3 )
+  g.strokeStyle = '#2a2018';
+  g.lineWidth = 4;
+  g.beginPath();
+  g.moveTo(hx, hy + 32);
+  g.quadraticCurveTo(hx - 14, hy + 44, hx - 24, hy + 34);
+  g.moveTo(hx, hy + 32);
+  g.quadraticCurveTo(hx + 14, hy + 44, hx + 24, hy + 34);
+  g.stroke();
+  // whiskers
+  g.lineWidth = 2.5;
+  g.strokeStyle = 'rgba(60,45,30,0.7)';
+  for (const s of [-1, 1]) {
+    for (const wy of [22, 34, 46]) {
+      g.beginPath();
+      g.moveTo(hx + s * 40, hy + wy - 6);
+      g.lineTo(hx + s * 128, hy + wy - 14 + (wy - 34) * 0.4);
+      g.stroke();
+    }
+  }
+
+  // Caption.
+  g.textAlign = 'center';
+  g.fillStyle = '#3a2b14';
+  g.font = '900 78px Georgia, "Times New Roman", serif';
+  g.fillText('HANG IN', W / 2, 618);
+  g.fillText('THERE', W / 2, 686);
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.anisotropy = 8;
+  tex.needsUpdate = true;
+  return tex;
 }

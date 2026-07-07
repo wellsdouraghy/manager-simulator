@@ -76,7 +76,7 @@ export const TITLE_SCREEN = {
   title: 'MANAGER SIMULATOR',
   subtitle: 'The inbox is not going to survive itself.',
   start: 'START DAY',
-  tagline: 'One 3-minute workday. Zero chill.',
+  tagline: 'One 90-second workday. Zero chill.',
 };
 
 // The how-to-play card. Shown after START DAY; click anywhere to begin.
@@ -1372,7 +1372,7 @@ export const TITLES = [
     when: 'speed',
     emoji: '⚡',
     grade: 'A',
-    blurb: 'Sub-four-second replies, all day. Your thumbs have seen things.',
+    blurb: 'Sub-three-second replies, all day. Your thumbs have seen things.',
   },
   {
     title: 'THE QUICK CALL MARTYR',

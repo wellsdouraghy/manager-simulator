@@ -18,9 +18,9 @@ const PHASES = [
   // Short, punchy warm-up then a fast climb — playtest wanted it to get busy
   // and fun sooner. The opening script (email@0 + text@~2.5s) still eases you
   // in, but "busy" now hits at 0:30 and "chaos" at 1:45.
-  { key: 'warmup', start: 0, end: 30, minGap: 6, maxGap: 7.5, ttlScale: 1.3 },
-  { key: 'busy', start: 30, end: 108, minGap: 3.5, maxGap: 5, ttlScale: 1.0 },
-  { key: 'chaos', start: 108, end: 180, minGap: 2, maxGap: 3, ttlScale: 0.8 },
+  { key: 'warmup', start: 0, end: 15, minGap: 4, maxGap: 5.5, ttlScale: 1.15 },
+  { key: 'busy', start: 15, end: 55, minGap: 2.6, maxGap: 3.6, ttlScale: 0.9 },
+  { key: 'chaos', start: 55, end: 90, minGap: 1.6, maxGap: 2.5, ttlScale: 0.7 },
 ];
 
 // Per-phase channel weights. Channels that aren't registered get weight 0 and
@@ -36,8 +36,8 @@ const CHANNEL_WEIGHTS = {
 // for "give me a bit more time on X". Emails and (especially) DMs got longer
 // fuses per playtest.
 const CHANNEL_TTL_SCALE = {
-  email: 1.25,
-  dm: 1.4,
+  email: 1.0,
+  dm: 1.1,
 };
 
 const rand = (min, max) => min + Math.random() * (max - min);

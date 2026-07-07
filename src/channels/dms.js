@@ -228,7 +228,7 @@ export function createDMChannel({ panelEl, engine, meters, rig, content }) {
     meters.stats.expired++;
     // Expired DM: apply onExpire effects (default −18 happiness) to the creator.
     // Left on read a few times and they walk — leaving talent is a real cost.
-    const onExpire = task.data.onExpire?.effects || { happiness: -18 };
+    const onExpire = task.data.onExpire?.effects || { happiness: -24 };
     const eff = { ...onExpire, creator: task.data.creator };
     meters.applyEffects(eff, null); // null task: no response-time push on expiry
     toast(toastCopy.expired, 'bad');
