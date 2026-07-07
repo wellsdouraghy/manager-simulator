@@ -1379,7 +1379,14 @@ export const TITLES = [
     when: 'speed',
     emoji: '⚡',
     grade: 'A',
-    blurb: 'Sub-three-second replies, all day. Your thumbs have seen things.',
+    blurb: 'Near-instant replies, all day, and the money to show for it.',
+  },
+  {
+    title: 'THE RAINMAKER',
+    when: 'rainmaker',
+    emoji: '💰',
+    grade: 'A',
+    blurb: 'Commission for days. The spreadsheet has a crush on you.',
   },
   {
     title: 'THE QUICK CALL MARTYR',
@@ -1394,6 +1401,13 @@ export const TITLES = [
     emoji: '🔥',
     grade: 'B',
     blurb: '80% burnt out and still swinging. Please rest. We know you won’t.',
+  },
+  {
+    title: 'SOLID QUARTER',
+    when: 'steady',
+    emoji: '📊',
+    grade: 'B',
+    blurb: 'A genuinely good day. The kind that quietly keeps the lights on.',
   },
   {
     title: 'THE MONEY PIT',

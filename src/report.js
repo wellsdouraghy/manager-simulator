@@ -33,27 +33,34 @@ import { createLeaderboard } from './leaderboard.js';
 // engine). S/A are set just under a truly excellent run — hard, but reachable
 // if you're really good. The top grades also require surviving to 6PM.
 const TITLE_PREDICATES = {
-  // S/A — reserved for excellent runs. With the faster spawn pacing, perfect
-  // play in the one-minute day tops out around $25–33k and ~3–4 closed deals
-  // (measured over the real spawn engine), so these are hard but reachable.
+  // Grades are primarily commission-driven (with the faster pacing, perfect play
+  // tops ~$25–33k; realistic excellent ~$18–20k, good ~$13–16k, medium ~$8–11k).
+  // Every good tier also requires surviving to 6PM.
+  //
+  // S — elite: a huge day AND you kept the whole roster.
   deity: (s, m, ctx) =>
-    m.commission >= 17000 && ctx.retained === 5 && ctx.survived,
-  closer: (s, m, ctx) => (s.dealsClosedTarget || 0) >= 2 && ctx.survived,
-  // Speed also requires real output, so fast-but-wrong clicking (which tanks
-  // commission) can't sneak an A.
+    m.commission >= 19000 && ctx.retained === 5 && ctx.survived,
+  // A — very good. Three flavors, all gated on real money so a persona alone
+  // (e.g. closing 2 easy deals or fast-but-wrong clicking) can't earn an A.
+  closer: (s, m, ctx) =>
+    (s.dealsClosedTarget || 0) >= 3 && m.commission >= 10000 && ctx.survived,
   speed: (s, m, ctx) =>
-    ctx.survived && m.avgResponseTime > 0 && m.avgResponseTime < 3 && m.commission >= 8000,
+    ctx.survived && m.avgResponseTime > 0 && m.avgResponseTime < 2.5 && m.commission >= 12000,
+  rainmaker: (s, m, ctx) => m.commission >= 13000 && ctx.survived,
+  // B — solid. Situational personas first, then a plain commission floor so a
+  // good-but-not-great day lands here instead of sneaking into A.
   martyr: (s, m) =>
     m.commission > 0 &&
     (s.quickCallsOffered || 0) > 0 &&
     s.quickCallsTaken === s.quickCallsOffered,
   grinding: (s, m, ctx) => m.peakBurnout >= 88 && ctx.survived && m.commission > 0,
+  steady: (s, m, ctx) => m.commission >= 8000 && ctx.survived,
   // Below C: F for a day that booked nothing (or lost money) or lost the whole
   // roster; D for passing out or barely scraping any commission together.
   flop: (s, m) => m.commission <= 0,
   exodus: (s) => s.failReason === 'exodus',
   passout: (s) => s.failReason === 'passout',
-  rough: (s, m, ctx) => ctx.survived && m.commission < 3000,
+  rough: (s, m, ctx) => ctx.survived && m.commission < 3500,
   lostTalent: (s) => (s.creatorsLost || 0) >= 1,
   default: () => true,
 };
