@@ -2045,6 +2045,19 @@ body:not([data-run-state='running']) .hud-day {
   color: var(--gold);
   opacity: 0.9;
 }
+.overlay-powered {
+  display: block;
+  margin-top: 22px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.overlay-powered b { color: var(--mint); font-weight: 800; }
+.overlay-powered:hover { color: rgba(255, 255, 255, 0.85); }
 .overlay-august,
 .rd-btn-august {
   margin-top: 18px;
@@ -2746,6 +2759,20 @@ body:not([data-run-state='running']) .hud-day {
   letter-spacing: 0.04em;
   color: color-mix(in srgb, var(--paper-ink) 60%, transparent);
 }
+.rd-powered {
+  display: block;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--paper-rule);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--paper-ink) 55%, transparent);
+  text-decoration: none;
+}
+.rd-powered b { color: #17a86a; font-weight: 900; }
 
 .rd-actions {
   display: flex;

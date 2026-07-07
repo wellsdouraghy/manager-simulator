@@ -173,18 +173,41 @@ export function buildRoom() {
   clock.add(pin);
   group.add(clock);
 
-  // Window colors: pale morning sun → deep orange evening as the day passes.
-  const sunMorning = new THREE.Color(0xffe6b0);
-  const sunEvening = new THREE.Color(0xff8036);
-  const _sunC = new THREE.Color();
+  // Window daylight ages across the workday: soft warm morning → bright gold
+  // midday → amber afternoon → deep sunset by 6PM, with the fake light shafts
+  // warming and dimming to match. A glance at the window tells you how late it is.
+  const SKY_STOPS = [
+    { k: 0.0, sun: 0xffe6b0, shaft: 0xfff0cf, op: 0.05 }, // 9:00 — soft morning
+    { k: 0.3, sun: 0xfff3d2, shaft: 0xfff2d6, op: 0.064 }, // ~11:40 — bright
+    { k: 0.55, sun: 0xffd583, shaft: 0xffe1a8, op: 0.055 }, // ~2:00 — golden
+    { k: 0.8, sun: 0xff9a45, shaft: 0xffb164, op: 0.04 }, // ~4:50 — amber
+    { k: 1.0, sun: 0xff5320, shaft: 0xff6a34, op: 0.026 }, // 6:00 — deep sunset
+  ];
+  const _sunA = new THREE.Color();
+  const _sunB = new THREE.Color();
+  const _shA = new THREE.Color();
+  const _shB = new THREE.Color();
 
-  /** t: 0..1 across the workday → clock hands sweep + the window sun warms. */
+  /** t: 0..1 across the workday → clock hands sweep + the window daylight ages. */
   function setDayProgress(t) {
     const k = THREE.MathUtils.clamp(t, 0, 1);
     const hours = 9 + 9 * k;
     hourHand.rotation.z = -((hours % 12) / 12) * Math.PI * 2;
-    minuteHand.rotation.z = -((hours % 1)) * Math.PI * 2;
-    sun.material.color.copy(_sunC.copy(sunMorning).lerp(sunEvening, k));
+    minuteHand.rotation.z = -(hours % 1) * Math.PI * 2;
+    // Blend between the two surrounding sky stops.
+    let a = SKY_STOPS[0];
+    let b = SKY_STOPS[SKY_STOPS.length - 1];
+    for (let i = 0; i < SKY_STOPS.length - 1; i++) {
+      if (k >= SKY_STOPS[i].k && k <= SKY_STOPS[i + 1].k) {
+        a = SKY_STOPS[i];
+        b = SKY_STOPS[i + 1];
+        break;
+      }
+    }
+    const f = a.k === b.k ? 0 : (k - a.k) / (b.k - a.k);
+    sun.material.color.copy(_sunA.setHex(a.sun).lerp(_sunB.setHex(b.sun), f));
+    shaftMat.color.copy(_shA.setHex(a.shaft).lerp(_shB.setHex(b.shaft), f));
+    shaftMat.opacity = a.op + (b.op - a.op) * f;
   }
   setDayProgress(0);
 

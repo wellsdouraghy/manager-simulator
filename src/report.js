@@ -22,6 +22,7 @@ import {
   GAME_URL,
   JULY_CTA,
   JULY_URL,
+  POWERED_BY,
 } from './content.js';
 import { createLeaderboard } from './leaderboard.js';
 
@@ -32,11 +33,11 @@ import { createLeaderboard } from './leaderboard.js';
 // engine). S/A are set just under a truly excellent run — hard, but reachable
 // if you're really good. The top grades also require surviving to 6PM.
 const TITLE_PREDICATES = {
-  // S/A — reserved for excellent runs. Perfect play in the one-minute day tops
-  // out around $21–27k and ~2–4 closed deals (measured over the real spawn
-  // engine), so these are hard but reachable.
+  // S/A — reserved for excellent runs. With the faster spawn pacing, perfect
+  // play in the one-minute day tops out around $25–33k and ~3–4 closed deals
+  // (measured over the real spawn engine), so these are hard but reachable.
   deity: (s, m, ctx) =>
-    m.commission >= 14000 && ctx.retained === 5 && ctx.survived,
+    m.commission >= 17000 && ctx.retained === 5 && ctx.survived,
   closer: (s, m, ctx) => (s.dealsClosedTarget || 0) >= 2 && ctx.survived,
   // Speed also requires real output, so fast-but-wrong clicking (which tanks
   // commission) can't sneak an A.
@@ -382,6 +383,8 @@ export function createReport({ meters, content, storage, juice }) {
           <div class="rd-leaderboard" id="rd-leaderboard"></div>
         </div>
         </div>
+
+        <a class="rd-powered" href="${POWERED_BY.url}" target="_blank" rel="noopener noreferrer">${POWERED_BY.pre} <b>${POWERED_BY.brand}</b></a>
 
         ${model.survived ? '' : `<div class="rd-watermark">${copy.incompleteStamp}</div>`}
       </div>

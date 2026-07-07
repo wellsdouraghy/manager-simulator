@@ -26,6 +26,7 @@ import {
   BURNOUT,
   AUGUST,
   AUGUST_NAME,
+  POWERED_BY,
   SOUND,
 } from './content.js';
 import * as CONTENT from './content.js';
@@ -427,6 +428,9 @@ function showTitle() {
       <div class="overlay-sub">${TITLE_SCREEN.subtitle}</div>
       <button class="overlay-btn" id="start-day">${TITLE_SCREEN.start}</button>
       ${bestLine}
+      <a class="overlay-powered" href="${POWERED_BY.url}" target="_blank" rel="noopener noreferrer">
+        ${POWERED_BY.pre} <b>${POWERED_BY.brand}</b>
+      </a>
     </div>
   `;
   overlay.querySelector('#start-day').addEventListener('click', showInstructions, {

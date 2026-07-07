@@ -12,6 +12,9 @@ export const JULY_URL = 'https://withjuly.com';
 /** July's AI layer. Kept as a constant so it's trivial to rename. */
 export const AUGUST_NAME = 'July AI';
 
+/** Small brand credit shown on the title + report screens. */
+export const POWERED_BY = { pre: 'powered by', brand: '⚡ July', url: JULY_URL };
+
 // The call-to-action shown INSTEAD of the shareable report when the run was
 // played with July AI on — sales-oriented, not a brag to screenshot.
 export const JULY_CTA = {

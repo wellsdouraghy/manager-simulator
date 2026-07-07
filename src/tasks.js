@@ -19,18 +19,18 @@ const PHASES = [
   // and fun sooner. Scaled to the one-minute workday: the opening script
   // (email@0 + text@~2.5s) still eases you in, but "busy" hits at 0:10 and
   // "chaos" at 0:38, so the finale is a genuine crunch.
-  { key: 'warmup', start: 0, end: 10, minGap: 3.4, maxGap: 4.6, ttlScale: 1.1 },
-  { key: 'busy', start: 10, end: 38, minGap: 2.4, maxGap: 3.3, ttlScale: 0.9 },
-  { key: 'chaos', start: 38, end: 60, minGap: 1.5, maxGap: 2.3, ttlScale: 0.7 },
+  { key: 'warmup', start: 0, end: 8, minGap: 2.5, maxGap: 3.4, ttlScale: 1.15 },
+  { key: 'busy', start: 8, end: 34, minGap: 1.8, maxGap: 2.6, ttlScale: 0.95 },
+  { key: 'chaos', start: 34, end: 60, minGap: 1.1, maxGap: 1.8, ttlScale: 0.75 },
 ];
 
 // Per-phase channel weights. Channels that aren't registered get weight 0 and
 // the remaining weights renormalize (see pickChannel). DMs pulled back (they
 // felt like the loudest thing); door pushed up (players want more walk-ins).
 const CHANNEL_WEIGHTS = {
-  warmup: { email: 0.75, dm: 0.22, door: 0.03 },
-  busy: { email: 0.46, dm: 0.22, negotiation: 0.16, invoice: 0.1, door: 0.11 },
-  chaos: { email: 0.36, dm: 0.24, negotiation: 0.18, invoice: 0.14, door: 0.12 },
+  warmup: { email: 0.58, dm: 0.34, door: 0.08 },
+  busy: { email: 0.38, dm: 0.26, negotiation: 0.18, invoice: 0.12, door: 0.06 },
+  chaos: { email: 0.3, dm: 0.26, negotiation: 0.2, invoice: 0.16, door: 0.08 },
 };
 
 // Per-channel ttl multiplier applied on top of the phase scale — a single knob
