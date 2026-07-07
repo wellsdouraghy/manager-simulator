@@ -15,7 +15,7 @@
 
 // Set to the deployed Worker origin, e.g. 'https://manager-leaderboard.x.workers.dev'.
 // Empty string → local-per-browser fallback mode.
-const ENDPOINT = 'https://manager-leaderboard.wellsdouraghy.workers.dev';
+export const ENDPOINT = 'https://manager-leaderboard.wellsdouraghy.workers.dev';
 
 const LS_BOARD = 'ms_leaderboard_v1'; // local fallback board
 const LS_ADMIN = 'ms_admin_key'; // sessionStorage cache of the admin secret
