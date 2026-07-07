@@ -125,11 +125,10 @@ export function createLeaderboard() {
         const del = adminMode
           ? `<button class="lb-del" data-id="${esc(e.id)}" title="Delete score">✕</button>`
           : '';
-        const gr = e.grade ? `<span class="lb-grade">${esc(e.grade)}</span>` : '';
         return `
           <div class="lb-row${mine}">
             <span class="lb-rank">${medal}</span>
-            <span class="lb-name">${esc(e.name)}${gr}</span>
+            <span class="lb-name">${esc(e.name)}</span>
             <span class="lb-score">${fmt$(e.score)}</span>
             ${del}
           </div>`;

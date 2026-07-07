@@ -2164,8 +2164,17 @@ body:not([data-run-state='running']) .hud-day {
   color: var(--grade);
   border-color: var(--grade);
 }
+.rd-tabs-body { overflow: hidden; }
 .rd-tab-panel { display: none; }
-.rd-tab-panel.is-active { display: block; animation: rdTabIn 0.25s ease-out; }
+.rd-tab-panel.is-active {
+  display: block;
+  height: 100%;
+  animation: rdTabIn 0.25s ease-out;
+}
+.rd-tab-panel[data-panel="leaderboard"].is-active {
+  display: flex;
+  flex-direction: column;
+}
 @keyframes rdTabIn {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
@@ -2175,6 +2184,10 @@ body:not([data-run-state='running']) .hud-day {
 .rd-leaderboard {
   margin-top: 4px;
   text-align: left;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 .lb-head {
   display: flex;
@@ -2249,7 +2262,8 @@ body:not([data-run-state='running']) .hud-day {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  max-height: 230px;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
 }
 .lb-empty {

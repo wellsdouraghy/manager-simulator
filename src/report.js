@@ -324,6 +324,7 @@ export function createReport({ meters, content, storage, juice }) {
           <button class="rd-tab" data-tab="leaderboard">${copy.tabLeaderboard || '🏆 Leaderboard'}</button>
         </div>
 
+        <div class="rd-tabs-body">
         <div class="rd-tab-panel is-active" data-panel="results">
           <div class="rd-hero">
             <div class="rd-grade-wrap">
@@ -379,6 +380,7 @@ export function createReport({ meters, content, storage, juice }) {
 
         <div class="rd-tab-panel" data-panel="leaderboard">
           <div class="rd-leaderboard" id="rd-leaderboard"></div>
+        </div>
         </div>
 
         ${model.survived ? '' : `<div class="rd-watermark">${copy.incompleteStamp}</div>`}
@@ -436,6 +438,15 @@ export function createReport({ meters, content, storage, juice }) {
     if (lbEl) leaderboard.mount(lbEl, { score: model.commission, grade: model.grade });
 
     el.classList.add('show');
+
+    // Pin both tabs to the Results panel's natural height so the card never
+    // resizes between tabs; the leaderboard list scrolls within that height.
+    // Done after `show` (the overlay is now visible, so scrollHeight is real)
+    // and synchronously, so it doesn't depend on rAF firing.
+    const bodyEl = el.querySelector('.rd-tabs-body');
+    const resultsEl = el.querySelector('.rd-tab-panel[data-panel="results"]');
+    if (bodyEl && resultsEl) bodyEl.style.height = resultsEl.scrollHeight + 'px';
+
     // Expose the built share text + title for headless verification.
     el.dataset.shareText = buildShareText(model);
     el.dataset.title = model.title;
