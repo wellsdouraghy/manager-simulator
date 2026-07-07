@@ -32,16 +32,28 @@ import { createLeaderboard } from './leaderboard.js';
 // engine). S/A are set just under a truly excellent run — hard, but reachable
 // if you're really good. The top grades also require surviving to 6PM.
 const TITLE_PREDICATES = {
+  // S/A — reserved for excellent runs. Perfect play in the one-minute day tops
+  // out around $21–27k and ~2–4 closed deals (measured over the real spawn
+  // engine), so these are hard but reachable.
   deity: (s, m, ctx) =>
-    m.commission >= 20000 && ctx.retained === 5 && ctx.survived,
-  closer: (s, m, ctx) => (s.dealsClosedTarget || 0) >= 3 && ctx.survived,
+    m.commission >= 14000 && ctx.retained === 5 && ctx.survived,
+  closer: (s, m, ctx) => (s.dealsClosedTarget || 0) >= 2 && ctx.survived,
+  // Speed also requires real output, so fast-but-wrong clicking (which tanks
+  // commission) can't sneak an A.
   speed: (s, m, ctx) =>
-    ctx.survived && m.avgResponseTime > 0 && m.avgResponseTime < 3,
-  martyr: (s) =>
-    (s.quickCallsOffered || 0) > 0 && s.quickCallsTaken === s.quickCallsOffered,
-  grinding: (s, m, ctx) => m.peakBurnout >= 88 && ctx.survived,
-  lostTalent: (s) => (s.creatorsLost || 0) >= 1,
+    ctx.survived && m.avgResponseTime > 0 && m.avgResponseTime < 3 && m.commission >= 8000,
+  martyr: (s, m) =>
+    m.commission > 0 &&
+    (s.quickCallsOffered || 0) > 0 &&
+    s.quickCallsTaken === s.quickCallsOffered,
+  grinding: (s, m, ctx) => m.peakBurnout >= 88 && ctx.survived && m.commission > 0,
+  // Below C: F for a day that booked nothing (or lost money) or lost the whole
+  // roster; D for passing out or barely scraping any commission together.
+  flop: (s, m) => m.commission <= 0,
+  exodus: (s) => s.failReason === 'exodus',
   passout: (s) => s.failReason === 'passout',
+  rough: (s, m, ctx) => ctx.survived && m.commission < 3000,
+  lostTalent: (s) => (s.creatorsLost || 0) >= 1,
   default: () => true,
 };
 

@@ -2384,6 +2384,7 @@ body:not([data-run-state='running']) .hud-day {
 .report-doc.grade-B { --grade: #2f7cc0; --grade-soft: rgba(47, 124, 192, 0.14); }
 .report-doc.grade-C { --grade: #7a6f57; --grade-soft: rgba(122, 111, 87, 0.12); }
 .report-doc.grade-D { --grade: #c0392b; --grade-soft: rgba(192, 57, 43, 0.12); }
+.report-doc.grade-F { --grade: #8a1a1a; --grade-soft: rgba(138, 26, 26, 0.14); }
 
 .rd-hero {
   display: flex;

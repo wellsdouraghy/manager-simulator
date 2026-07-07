@@ -52,11 +52,11 @@ import { createReport } from './report.js';
 export const G = {
   timeScale: 1, // coffee slow-mo dials this down; camera/UI ignore it
   runState: 'title', // title | running | report
-  dayT: 0, // 0..1 across the 180s workday
+  dayT: 0, // 0..1 across the workday
   paused: false, // creator-leaves overlay freezes the running block + channels
 };
 
-export const DAY_LENGTH = 90; // seconds, 9:00 AM → 6:00 PM
+export const DAY_LENGTH = 60; // seconds, 9:00 AM → 6:00 PM (one-minute workday)
 
 // Burnout points shed per game-second while running — the passive relief that
 // replaced coffee. Tuned below the damage rates so chaos still bites.

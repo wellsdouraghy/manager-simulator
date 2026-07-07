@@ -78,7 +78,7 @@ export const TITLE_SCREEN = {
   title: 'MANAGER SIMULATOR',
   subtitle: 'The inbox is not going to survive itself.',
   start: 'START DAY',
-  tagline: 'One 90-second workday. Zero chill.',
+  tagline: 'One 60-second workday. Zero chill.',
 };
 
 // The how-to-play card. Shown after START DAY; click anywhere to begin.
@@ -1393,11 +1393,18 @@ export const TITLES = [
     blurb: '80% burnt out and still swinging. Please rest. We know you won’t.',
   },
   {
-    title: 'EXPLORING OTHER REPRESENTATION',
-    when: 'lostTalent',
-    emoji: '💔',
-    grade: 'C',
-    blurb: 'A creator left to "explore other representation." The pastures are not greener.',
+    title: 'THE MONEY PIT',
+    when: 'flop',
+    emoji: '🕳️',
+    grade: 'F',
+    blurb: 'You booked nothing — or less than nothing. The desk won today.',
+  },
+  {
+    title: 'MASS EXODUS',
+    when: 'exodus',
+    emoji: '🚪',
+    grade: 'F',
+    blurb: 'The entire roster walked. Your CRM is a memorial now.',
   },
   {
     title: 'TOUCH GRASS (PLEASE)',
@@ -1405,6 +1412,20 @@ export const TITLES = [
     emoji: '🫠',
     grade: 'D',
     blurb: 'You passed out at your desk. The inbox won. Today. Only today.',
+  },
+  {
+    title: 'BARELY THERE',
+    when: 'rough',
+    emoji: '😵‍💫',
+    grade: 'D',
+    blurb: 'Technically a full day. Almost nothing to show the accountant.',
+  },
+  {
+    title: 'EXPLORING OTHER REPRESENTATION',
+    when: 'lostTalent',
+    emoji: '💔',
+    grade: 'C',
+    blurb: 'A creator left to "explore other representation." The pastures are not greener.',
   },
   {
     title: 'PER MY LAST EMAIL',

@@ -16,11 +16,12 @@ let _taskSeq = 0;
 // spawn-interval window (randomized inside) and the ttl scale for that phase.
 const PHASES = [
   // Short, punchy warm-up then a fast climb — playtest wanted it to get busy
-  // and fun sooner. The opening script (email@0 + text@~2.5s) still eases you
-  // in, but "busy" now hits at 0:30 and "chaos" at 1:45.
-  { key: 'warmup', start: 0, end: 15, minGap: 4, maxGap: 5.5, ttlScale: 1.15 },
-  { key: 'busy', start: 15, end: 55, minGap: 2.6, maxGap: 3.6, ttlScale: 0.9 },
-  { key: 'chaos', start: 55, end: 90, minGap: 1.6, maxGap: 2.5, ttlScale: 0.7 },
+  // and fun sooner. Scaled to the one-minute workday: the opening script
+  // (email@0 + text@~2.5s) still eases you in, but "busy" hits at 0:10 and
+  // "chaos" at 0:38, so the finale is a genuine crunch.
+  { key: 'warmup', start: 0, end: 10, minGap: 3.4, maxGap: 4.6, ttlScale: 1.1 },
+  { key: 'busy', start: 10, end: 38, minGap: 2.4, maxGap: 3.3, ttlScale: 0.9 },
+  { key: 'chaos', start: 38, end: 60, minGap: 1.5, maxGap: 2.3, ttlScale: 0.7 },
 ];
 
 // Per-phase channel weights. Channels that aren't registered get weight 0 and
