@@ -5,6 +5,7 @@
 
 const KEYS = {
   best: 'ms:best',
+  lastScore: 'ms:lastScore', // last non-July run commission (July CTA baseline)
   augustUnlocked: 'ms:augustUnlocked',
   augustOn: 'ms:augustOn',
   soundOn: 'ms:soundOn',
@@ -45,6 +46,12 @@ export function createStorage() {
     },
     setBestCommission(n) {
       writeRaw(KEYS.best, Math.round(n));
+    },
+    getLastScore() {
+      return readNum(KEYS.lastScore, 0);
+    },
+    setLastScore(n) {
+      writeRaw(KEYS.lastScore, Math.round(n));
     },
     getAugustUnlocked() {
       return readBool(KEYS.augustUnlocked, false);

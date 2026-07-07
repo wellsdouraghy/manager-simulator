@@ -20,6 +20,8 @@ export const JULY_CTA = {
   body: 'July AI just called every shot for you. The real July is the back-office platform for talent agencies — deals, invoices, commissions, and contracts, all handled in one place.',
   statPrefix: 'You booked',
   statSuffix: 'with the assist.',
+  improvePrefix: 'Your last run',
+  improveWith: 'With July AI',
   cta: 'Get July for your agency →',
   again: 'Play again',
 };
@@ -1316,6 +1318,8 @@ export const INVOICES = [
 export const REPORT_CARD = {
   docTitle: 'Q3 PERFORMANCE REVIEW — JULY',
   reviewedBy: 'REVIEWED BY: yourself, at your desk',
+  tabResults: '📄 Results',
+  tabLeaderboard: '🏆 Leaderboard',
   survivedHeading: 'DAY SURVIVED',
   incompleteHeading: 'DAY INCOMPLETE',
   incompleteStamp: 'INCOMPLETE',

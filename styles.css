@@ -2138,11 +2138,42 @@ body:not([data-run-state='running']) .hud-day {
   font-style: italic;
 }
 
+/* --- Report tabs (Results / Leaderboard) ----------------------------------- */
+.rd-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 10px 0 4px;
+}
+.rd-tab {
+  font: inherit;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  padding: 7px 16px;
+  border: 1px solid var(--paper-rule);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: color-mix(in srgb, var(--paper-ink) 6%, transparent);
+  color: color-mix(in srgb, var(--paper-ink) 55%, transparent);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.rd-tab:hover { color: var(--paper-ink); }
+.rd-tab.is-active {
+  background: var(--grade-soft);
+  color: var(--grade);
+  border-color: var(--grade);
+}
+.rd-tab-panel { display: none; }
+.rd-tab-panel.is-active { display: block; animation: rdTabIn 0.25s ease-out; }
+@keyframes rdTabIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* --- Leaderboard (inside the report card) ---------------------------------- */
 .rd-leaderboard {
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid var(--paper-rule);
+  margin-top: 4px;
   text-align: left;
 }
 .lb-head {
@@ -2527,6 +2558,67 @@ body:not([data-run-state='running']) .hud-day {
   margin-bottom: 4px;
 }
 .jc-stat b { color: #17a86a; font-weight: 900; }
+
+/* July CTA: last run → with July AI comparison */
+.jc-compare {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 2px 0 14px;
+  flex-wrap: wrap;
+}
+.jc-cmp-old, .jc-cmp-new {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+}
+.jc-cmp-old span, .jc-cmp-new span {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #94a0ae;
+  margin-bottom: 3px;
+}
+.jc-cmp-old b {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 900;
+  color: #aab3bf;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+.jc-cmp-new { position: relative; }
+.jc-cmp-new span { color: #17a86a; }
+.jc-cmp-new b {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 900;
+  color: #17a86a;
+}
+.jc-cmp-delta {
+  position: absolute;
+  top: -6px;
+  right: -46px;
+  font-size: 13px;
+  font-weight: 900;
+  font-style: normal;
+  color: #fff;
+  background: #17a86a;
+  padding: 2px 8px;
+  border-radius: 999px;
+  transform: rotate(6deg);
+  box-shadow: 0 4px 12px rgba(23, 168, 106, 0.4);
+}
+.jc-cmp-arrow {
+  font-size: 26px;
+  font-weight: 900;
+  color: #17a86a;
+  margin-top: 12px;
+}
+
 .jc-title {
   font-family: var(--font-display);
   font-weight: 900;

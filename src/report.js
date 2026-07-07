@@ -27,14 +27,19 @@ import { createLeaderboard } from './leaderboard.js';
 
 // --- Title predicate table -------------------------------------------------
 // ctx = { retained, dealsClosedTarget, survived }
+// Calibrated to the 90-second day: a perfect, instant-response run tops out
+// around $27–33k commission and ~4 closed deals (measured over the real spawn
+// engine). S/A are set just under a truly excellent run — hard, but reachable
+// if you're really good. The top grades also require surviving to 6PM.
 const TITLE_PREDICATES = {
   deity: (s, m, ctx) =>
-    m.commission >= 90000 && ctx.retained === 5 && m.avgResponseTime < 4,
-  closer: (s) => (s.dealsClosedTarget || 0) >= 6,
-  speed: (s, m) => m.avgResponseTime > 0 && m.avgResponseTime < 3,
+    m.commission >= 20000 && ctx.retained === 5 && ctx.survived,
+  closer: (s, m, ctx) => (s.dealsClosedTarget || 0) >= 3 && ctx.survived,
+  speed: (s, m, ctx) =>
+    ctx.survived && m.avgResponseTime > 0 && m.avgResponseTime < 3,
   martyr: (s) =>
     (s.quickCallsOffered || 0) > 0 && s.quickCallsTaken === s.quickCallsOffered,
-  grinding: (s, m, ctx) => m.peakBurnout >= 90 && ctx.survived,
+  grinding: (s, m, ctx) => m.peakBurnout >= 88 && ctx.survived,
   lostTalent: (s) => (s.creatorsLost || 0) >= 1,
   passout: (s) => s.failReason === 'passout',
   default: () => true,
@@ -224,11 +229,30 @@ export function createReport({ meters, content, storage, juice }) {
   function showJulyCta(el, model) {
     const c = content?.JULY_CTA || JULY_CTA;
     const julyUrl = content?.JULY_URL || JULY_URL;
-    const commission = '$' + model.commission.toLocaleString('en-US');
+    const money = (n) => '$' + Math.round(n).toLocaleString('en-US');
+
+    // The point of this screen is "July AI made you better." Compare against
+    // your last honest (no-assist) run and GUARANTEE a lift: at least +15% and
+    // at least +$1,500 absolute, so even a tiny/zero baseline shows a real jump.
+    // If you genuinely scored higher, we show the real (bigger) number.
+    const baseline = Math.max(0, storage ? storage.getLastScore() : 0);
+    let improved = Math.max(model.commission, Math.round(baseline * 1.15), baseline + 1500);
+    improved = Math.round(improved / 50) * 50; // tidy the figure
+    const pct = baseline > 0 ? Math.round(((improved - baseline) / baseline) * 100) : null;
+
+    const headline =
+      baseline > 0
+        ? `<div class="jc-compare">
+             <div class="jc-cmp-old"><span>${c.improvePrefix}</span><b>${money(baseline)}</b></div>
+             <div class="jc-cmp-arrow">→</div>
+             <div class="jc-cmp-new"><span>${c.improveWith}</span><b>${money(improved)}</b><em class="jc-cmp-delta">+${pct}%</em></div>
+           </div>`
+        : `<div class="jc-stat">${c.statPrefix} <b>${money(improved)}</b> ${c.statSuffix}</div>`;
+
     el.innerHTML = `
       <div class="report-doc july-cta">
         <div class="jc-logo">${c.logo}</div>
-        <div class="jc-stat">${c.statPrefix} <b>${commission}</b> ${c.statSuffix}</div>
+        ${headline}
         <h1 class="jc-title">${c.title}</h1>
         <p class="jc-body">${c.body}</p>
         <a class="jc-cta" href="${julyUrl}" target="_blank" rel="noopener noreferrer">${c.cta}</a>
@@ -262,6 +286,8 @@ export function createReport({ meters, content, storage, juice }) {
     // Persist the new best BEFORE we render the tag, but read `best` above so we
     // compare against the pre-run value.
     if (model.commission > best) storage?.setBestCommission(model.commission);
+    // Record this honest run as the baseline the July-AI CTA improves on.
+    storage?.setLastScore(model.commission);
 
     const star = model.augustUsed ? '<span class="rd-star">*</span>' : '';
     const heading = model.survived ? copy.survivedHeading : copy.incompleteHeading;
@@ -281,63 +307,83 @@ export function createReport({ meters, content, storage, juice }) {
         <div class="rd-datebar">${copy.docTitle}</div>
         <div class="rd-rule rd-rule-double"></div>
 
-        <div class="rd-hero">
-          <div class="rd-grade-wrap">
-            <div class="rd-grade">${model.grade}</div>
-            <div class="rd-grade-label">${copy.gradeLabel}</div>
-          </div>
-          <div class="rd-persona">
-            <div class="rd-emoji">${model.emoji}</div>
-            <div class="rd-stamp rd-stamp-title ${model.survived ? '' : 'rd-stamp-fail'}">${model.title}</div>
-            <div class="rd-blurb">“${model.blurb}”</div>
-          </div>
-        </div>
-        <div class="rd-heading-mini">${heading}${failLine ? ` — ${failLine}` : ''}</div>
-
-        <div class="rd-rule"></div>
-
-        <div class="rd-rows">
-          ${statRow(copy.labels.commission, `<span id="rd-commission">$${model.commission.toLocaleString('en-US')}</span>${star}`, {
-            tag: beatBest ? copy.personalBest : '',
-          })}
-          ${statRow(copy.labels.deals, `${model.dealsClosed} / ${model.dealsAttempted}${star}`)}
-          ${statRow(copy.labels.invoices, `${model.invoicesPaid}${star}`)}
-          ${statRow(
-            copy.labels.retained,
-            `${model.retained} / ${model.rosterSize} <span class="rd-hearts">${model.hearts.join('')}</span>${star}`,
-          )}
-          ${statRow(copy.labels.response, `${fmtResponse(model.avgResponse)}${copy.units.response}${star}`)}
-          ${statRow(copy.labels.tasksMissed, `${model.tasksMissed}${star}`)}
+        <div class="rd-tabs" role="tablist">
+          <button class="rd-tab is-active" data-tab="results">${copy.tabResults || '📄 Results'}</button>
+          <button class="rd-tab" data-tab="leaderboard">${copy.tabLeaderboard || '🏆 Leaderboard'}</button>
         </div>
 
-        <div class="rd-rule rd-rule-double"></div>
+        <div class="rd-tab-panel is-active" data-panel="results">
+          <div class="rd-hero">
+            <div class="rd-grade-wrap">
+              <div class="rd-grade">${model.grade}</div>
+              <div class="rd-grade-label">${copy.gradeLabel}</div>
+            </div>
+            <div class="rd-persona">
+              <div class="rd-emoji">${model.emoji}</div>
+              <div class="rd-stamp rd-stamp-title ${model.survived ? '' : 'rd-stamp-fail'}">${model.title}</div>
+              <div class="rd-blurb">“${model.blurb}”</div>
+            </div>
+          </div>
+          <div class="rd-heading-mini">${heading}${failLine ? ` — ${failLine}` : ''}</div>
 
-        ${
-          model.augustUsed
-            ? `<div class="rd-august-legend">${copy.augustFootnote(augustName)}</div>
-               <div class="rd-august-deadpan">${copy.augustDeadpan}</div>`
-            : ''
-        }
+          <div class="rd-rule"></div>
 
-        <div class="rd-footer">${copy.reviewedBy}</div>
+          <div class="rd-rows">
+            ${statRow(copy.labels.commission, `<span id="rd-commission">$${model.commission.toLocaleString('en-US')}</span>${star}`, {
+              tag: beatBest ? copy.personalBest : '',
+            })}
+            ${statRow(copy.labels.deals, `${model.dealsClosed} / ${model.dealsAttempted}${star}`)}
+            ${statRow(copy.labels.invoices, `${model.invoicesPaid}${star}`)}
+            ${statRow(
+              copy.labels.retained,
+              `${model.retained} / ${model.rosterSize} <span class="rd-hearts">${model.hearts.join('')}</span>${star}`,
+            )}
+            ${statRow(copy.labels.response, `${fmtResponse(model.avgResponse)}${copy.units.response}${star}`)}
+            ${statRow(copy.labels.tasksMissed, `${model.tasksMissed}${star}`)}
+          </div>
 
-        <div class="rd-actions">
-          <button class="rd-btn rd-btn-copy" id="rd-copy">${copy.copy}</button>
-          <button class="rd-btn rd-btn-again" id="rd-again">${copy.again}</button>
+          <div class="rd-rule rd-rule-double"></div>
+
           ${
-            augustUnlocked
-              ? `<button class="rd-btn rd-btn-august" id="rd-august">${august.tryAgainLabel(augustName)}</button>`
+            model.augustUsed
+              ? `<div class="rd-august-legend">${copy.augustFootnote(augustName)}</div>
+                 <div class="rd-august-deadpan">${copy.augustDeadpan}</div>`
               : ''
           }
-        </div>
-        ${augustUnlocked ? `<div class="rd-august-desc">${august.description}</div>` : ''}
 
-        <div class="rd-leaderboard" id="rd-leaderboard"></div>
+          <div class="rd-footer">${copy.reviewedBy}</div>
+
+          <div class="rd-actions">
+            <button class="rd-btn rd-btn-copy" id="rd-copy">${copy.copy}</button>
+            <button class="rd-btn rd-btn-again" id="rd-again">${copy.again}</button>
+            ${
+              augustUnlocked
+                ? `<button class="rd-btn rd-btn-august" id="rd-august">${august.tryAgainLabel(augustName)}</button>`
+                : ''
+            }
+          </div>
+          ${augustUnlocked ? `<div class="rd-august-desc">${august.description}</div>` : ''}
+        </div>
+
+        <div class="rd-tab-panel" data-panel="leaderboard">
+          <div class="rd-leaderboard" id="rd-leaderboard"></div>
+        </div>
 
         ${model.survived ? '' : `<div class="rd-watermark">${copy.incompleteStamp}</div>`}
       </div>
       ${confetti}
     `;
+
+    // Tab switching (Results ↔ Leaderboard).
+    const tabs = [...el.querySelectorAll('.rd-tab')];
+    const panels = [...el.querySelectorAll('.rd-tab-panel')];
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const name = tab.dataset.tab;
+        tabs.forEach((t) => t.classList.toggle('is-active', t === tab));
+        panels.forEach((p) => p.classList.toggle('is-active', p.dataset.panel === name));
+      });
+    });
 
     // Delight: a fanfare sting on a win, a sad buzz on a fail.
     if (juice?.sound) {
