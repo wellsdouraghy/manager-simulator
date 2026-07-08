@@ -418,6 +418,9 @@ export function createReport({ meters, content, storage, juice }) {
         const name = tab.dataset.tab;
         tabs.forEach((t) => t.classList.toggle('is-active', t === tab));
         panels.forEach((p) => p.classList.toggle('is-active', p.dataset.panel === name));
+        // Refetch on open so the board includes scores posted since the card
+        // rendered (yours from the gate is already in via the POST response).
+        if (name === 'leaderboard') leaderboard.refresh();
       });
     });
 

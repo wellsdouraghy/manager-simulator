@@ -122,27 +122,34 @@ export function createLeaderboard() {
     hostEl.innerHTML = html;
   }
 
+  function rowHtml(e, i) {
+    const mine = e.id && e.id === myId ? ' lb-row-mine' : '';
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+    const del = adminMode
+      ? `<button class="lb-del" data-id="${esc(e.id)}" title="Delete score">✕</button>`
+      : '';
+    return `
+      <div class="lb-row${mine}">
+        <span class="lb-rank">${medal}</span>
+        <span class="lb-name">${esc(e.name)}</span>
+        <span class="lb-score">${fmt$(e.score)}</span>
+        ${del}
+      </div>`;
+  }
+
   function rowsHtml() {
     const top = board.slice(0, TOP_SHOW);
     if (!top.length) {
       return `<div class="lb-empty">No scores yet — be the first.</div>`;
     }
-    return top
-      .map((e, i) => {
-        const mine = e.id && e.id === myId ? ' lb-row-mine' : '';
-        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
-        const del = adminMode
-          ? `<button class="lb-del" data-id="${esc(e.id)}" title="Delete score">✕</button>`
-          : '';
-        return `
-          <div class="lb-row${mine}">
-            <span class="lb-rank">${medal}</span>
-            <span class="lb-name">${esc(e.name)}</span>
-            <span class="lb-score">${fmt$(e.score)}</span>
-            ${del}
-          </div>`;
-      })
-      .join('');
+    let html = top.map(rowHtml).join('');
+    // Your entry always shows, even ranked below the cutoff — appended after a
+    // "…" separator so you're never left wondering whether your score saved.
+    const myIdx = myId ? board.findIndex((e) => e.id === myId) : -1;
+    if (myIdx >= TOP_SHOW) {
+      html += `<div class="lb-gap">⋯</div>${rowHtml(board[myIdx], myIdx)}`;
+    }
+    return html;
   }
 
   function adminBadge() {
@@ -320,5 +327,7 @@ export function createLeaderboard() {
 
   // `submit` lets the report card's name gate post the mounted run's score
   // directly (same path as the in-tab form; resolves true on success).
-  return { mount, unmount, submit: (name) => doSubmit(name) };
+  // `refresh` refetches the board — called when the Leaderboard tab is opened
+  // so it always shows scores posted since the report card rendered.
+  return { mount, unmount, submit: (name) => doSubmit(name), refresh };
 }

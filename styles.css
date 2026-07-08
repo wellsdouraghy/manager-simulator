@@ -2285,6 +2285,15 @@ body:not([data-run-state='running']) .hud-day {
   opacity: 0.6;
   padding: 8px 0;
 }
+/* Separator before your own row when you rank below the rendered top slice. */
+.lb-gap {
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  opacity: 0.45;
+  line-height: 1;
+  padding: 2px 0;
+}
 .lb-row {
   display: grid;
   grid-template-columns: 30px 1fr auto auto;

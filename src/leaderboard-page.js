@@ -110,3 +110,10 @@ window.addEventListener('keydown', (e) => {
 
 refresh();
 setInterval(refresh, 30000);
+// Refetch the instant the tab regains focus — the common flow is "finish a
+// run in the game tab, flip over here to see your name" and a 30s poll feels
+// stale for that.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) refresh();
+});
+window.addEventListener('focus', refresh);
