@@ -19,7 +19,16 @@ export const ENDPOINT = 'https://manager-leaderboard.wellsdouraghy.workers.dev';
 
 const LS_BOARD = 'ms_leaderboard_v1'; // local fallback board
 const LS_ADMIN = 'ms_admin_key'; // sessionStorage cache of the admin secret
+const LS_NAME = 'ms_player_name'; // last name used, prefilled on the next run
 const TOP_SHOW = 12; // rows rendered
+
+export function getSavedName() {
+  try {
+    return localStorage.getItem(LS_NAME) || '';
+  } catch {
+    return '';
+  }
+}
 
 const esc = (s) =>
   String(s).replace(
@@ -207,9 +216,11 @@ export function createLeaderboard() {
     render();
   }
 
+  // Returns true on success so callers (the in-tab form AND the report card's
+  // name gate) can tell whether the score actually made it onto the board.
   async function doSubmit(rawName) {
     const name = cleanName(rawName);
-    const submitBtn = hostEl.querySelector('#lb-submit');
+    const submitBtn = hostEl?.querySelector('#lb-submit');
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.textContent = 'Saving…';
@@ -224,9 +235,15 @@ export function createLeaderboard() {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Retry';
       }
-      return;
+      return false;
+    }
+    try {
+      localStorage.setItem(LS_NAME, name);
+    } catch {
+      /* ignore */
     }
     render();
+    return true;
   }
 
   function getAdminKey() {
@@ -301,5 +318,7 @@ export function createLeaderboard() {
     hostEl = null;
   }
 
-  return { mount, unmount };
+  // `submit` lets the report card's name gate post the mounted run's score
+  // directly (same path as the in-tab form; resolves true on success).
+  return { mount, unmount, submit: (name) => doSubmit(name) };
 }

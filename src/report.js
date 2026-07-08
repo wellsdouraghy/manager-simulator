@@ -24,7 +24,7 @@ import {
   JULY_URL,
   POWERED_BY,
 } from './content.js';
-import { createLeaderboard } from './leaderboard.js';
+import { createLeaderboard, getSavedName } from './leaderboard.js';
 
 // --- Title predicate table -------------------------------------------------
 // ctx = { retained, dealsClosedTarget, survived }
@@ -323,7 +323,7 @@ export function createReport({ meters, content, storage, juice }) {
     const confetti = celebratory ? confettiHtml() : '';
 
     el.innerHTML = `
-      <div class="report-doc grade-${model.grade} ${model.survived ? '' : 'is-incomplete'}">
+      <div class="report-doc is-gated grade-${model.grade} ${model.survived ? '' : 'is-incomplete'}">
         <div class="rd-datebar">${copy.docTitle}</div>
         <div class="rd-rule rd-rule-double"></div>
 
@@ -394,8 +394,20 @@ export function createReport({ meters, content, storage, juice }) {
         <a class="rd-powered" href="${POWERED_BY.url}" target="_blank" rel="noopener noreferrer">${POWERED_BY.pre} <b>${POWERED_BY.brand}</b></a>
 
         ${model.survived ? '' : `<div class="rd-watermark">${copy.incompleteStamp}</div>`}
+
+        <div class="rd-gate" id="rd-gate">
+          <div class="rd-gate-card">
+            <div class="rd-gate-title">${copy.gateTitle}</div>
+            <div class="rd-gate-sub">${copy.gateSub}</div>
+            <div class="rd-gate-form">
+              <input class="rd-gate-input" id="rd-gate-name" maxlength="24"
+                     placeholder="${copy.gatePlaceholder}" autocomplete="off" spellcheck="false" />
+              <button class="rd-gate-btn" id="rd-gate-go" disabled>${copy.gateButton}</button>
+            </div>
+            <div class="rd-gate-err" id="rd-gate-err"></div>
+          </div>
+        </div>
       </div>
-      ${confetti}
     `;
 
     // Tab switching (Results ↔ Leaderboard).
@@ -409,13 +421,55 @@ export function createReport({ meters, content, storage, juice }) {
       });
     });
 
-    // Delight: a fanfare sting on a win, a sad buzz on a fail.
-    if (juice?.sound) {
-      if (celebratory) juice.sound.dealClose?.();
-      else if (!model.survived) juice.sound.expireBuzz?.();
+    // The card opens gated: results blurred until the run is signed onto the
+    // leaderboard. All the payoff (fanfare, count-up, confetti) waits for the
+    // reveal so the blur doesn't spoil it.
+    const doc = el.querySelector('.report-doc');
+    function reveal() {
+      if (!doc.classList.contains('is-gated')) return;
+      doc.classList.remove('is-gated');
+      el.querySelector('#rd-gate')?.remove();
+      if (juice?.sound) {
+        if (celebratory) juice.sound.dealClose?.();
+        else if (!model.survived) juice.sound.expireBuzz?.();
+      }
+      countUp(el.querySelector('#rd-commission'), model.commission);
+      if (confetti) el.insertAdjacentHTML('beforeend', confetti);
     }
-    // Commission count-up (enhancement; the final value is already in the DOM).
-    countUp(el.querySelector('#rd-commission'), model.commission);
+
+    const gateInput = el.querySelector('#rd-gate-name');
+    const gateBtn = el.querySelector('#rd-gate-go');
+    const gateErr = el.querySelector('#rd-gate-err');
+    if (gateInput && gateBtn) {
+      // Prefill the last name used so a RUN IT BACK loop is one click.
+      gateInput.value = getSavedName();
+      gateBtn.disabled = !gateInput.value.trim();
+      gateInput.addEventListener('input', () => {
+        gateBtn.disabled = !gateInput.value.trim();
+      });
+      const go = async () => {
+        const name = gateInput.value.trim();
+        if (!name || gateBtn.disabled) return;
+        gateBtn.disabled = true;
+        gateBtn.textContent = copy.gateSaving;
+        const ok = await leaderboard.submit(name);
+        if (ok) {
+          reveal();
+          return;
+        }
+        // Board unreachable: let them retry, and offer a way out so nobody is
+        // ever locked away from their own result by a network hiccup.
+        gateBtn.disabled = false;
+        gateBtn.textContent = copy.gateButton;
+        gateErr.innerHTML = `${copy.gateError} <button class="rd-gate-skip" id="rd-gate-skip">${copy.gateSkip}</button>`;
+        el.querySelector('#rd-gate-skip')?.addEventListener('click', reveal);
+      };
+      gateBtn.addEventListener('click', go);
+      gateInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') go();
+      });
+      setTimeout(() => gateInput.focus(), 50);
+    }
 
     // COPY RESULT
     const copyBtn = el.querySelector('#rd-copy');

@@ -2774,6 +2774,102 @@ body:not([data-run-state='running']) .hud-day {
 }
 .rd-powered b { color: #17a86a; font-weight: 900; }
 
+/* --- Name gate: the review stays blurred until you sign it onto the board --- */
+.report-doc.is-gated .rd-tabs,
+.report-doc.is-gated .rd-tabs-body,
+.report-doc.is-gated .rd-powered,
+.report-doc.is-gated .rd-watermark {
+  filter: blur(14px);
+  pointer-events: none;
+  user-select: none;
+}
+.rd-gate {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: color-mix(in srgb, var(--paper) 35%, transparent);
+}
+.rd-gate-card {
+  width: min(360px, 100%);
+  text-align: center;
+  background: var(--paper);
+  border: 1px solid var(--paper-rule);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35), inset 0 0 0 3px var(--paper),
+    inset 0 0 0 4px var(--paper-rule);
+  padding: 22px 22px 18px;
+  animation: reportDrop 0.45s cubic-bezier(0.2, 1.1, 0.4, 1) both;
+}
+.rd-gate-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.rd-gate-sub {
+  margin-top: 6px;
+  font-size: 13px;
+  font-style: italic;
+  color: color-mix(in srgb, var(--paper-ink) 65%, transparent);
+}
+.rd-gate-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.rd-gate-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--paper-rule);
+  background: #fffdf6;
+  color: var(--paper-ink);
+}
+.rd-gate-input:focus {
+  outline: 2px solid #d99e14;
+  outline-offset: 0;
+}
+.rd-gate-btn {
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  color: #171d33;
+  background: #ffc94d;
+  box-shadow: 0 2px 0 #d99e14;
+  white-space: nowrap;
+}
+.rd-gate-btn:hover:not(:disabled) { filter: brightness(1.05); }
+.rd-gate-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.rd-gate-err {
+  margin-top: 10px;
+  font-size: 12px;
+  font-family: var(--font-ui, system-ui, sans-serif);
+  color: #c0392b;
+  min-height: 1em;
+}
+.rd-gate-skip {
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
 .rd-actions {
   display: flex;
   flex-wrap: wrap;

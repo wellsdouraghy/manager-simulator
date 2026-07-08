@@ -1323,6 +1323,15 @@ export const REPORT_CARD = {
   reviewedBy: 'REVIEWED BY: yourself, at your desk',
   tabResults: '📄 Results',
   tabLeaderboard: '🏆 Leaderboard',
+  // The name gate: the review stays blurred until you sign it, which posts
+  // your score to the shared leaderboard.
+  gateTitle: '📋 Your review is in.',
+  gateSub: 'Sign it to see your grade. Your score goes on the leaderboard.',
+  gatePlaceholder: 'Your name',
+  gateButton: 'REVEAL MY GRADE',
+  gateSaving: 'Filing…',
+  gateError: 'Couldn’t reach the board — try again.',
+  gateSkip: 'continue without saving →',
   survivedHeading: 'DAY SURVIVED',
   incompleteHeading: 'DAY INCOMPLETE',
   incompleteStamp: 'INCOMPLETE',
